@@ -260,10 +260,16 @@ void s_init(void)
 	ddr_init_elpida(); /* This is needed even if this is another Memory popped on OMAP. 
 			      Need a first DDR setting in order to access the Manufacturer ID register*/
 
-	if (sdram_vendor() == SAMSUNG_SDRAM)
-	ddr_init_samsung();
-	else if (sdram_vendor() == ELPIDA_SDRAM) ;
-	// ddr_init_elpida(); /* No Need to do DDR setting again for Elpida */
+	switch (sdram_vendor()) {
+		case	SAMSUNG_SDRAM:
+			ddr_init_samsung();
+			break;
+		case	HYNIX_SDRAM: // Hynix memory uses same config as Elpida
+		case	ELPIDA_SDRAM:
+		default:
+		//	ddr_init_elpida(); // No need to init twice
+			break;
+	}
 }
 
 /******************************************************
@@ -281,4 +287,13 @@ void wait_for_command_complete(unsigned int wd_base)
 int nand_init(void)
 {
 	return 1;
+}
+
+int get_hwid(void) {
+	u32 hwid;
+	hwid = __raw_readl(OMAP4_GPIO_DATAIN_GPIO2);
+	return ((( hwid & GPIO51 ) >> 19 ) | (( hwid & GPIO50 ) >> 17 ) |
+		(( hwid & GPIO49 ) >> 15 ) | (( hwid & GPIO41 ) >> 6 ) |
+		(( hwid & GPIO40 ) >> 4 ) | (( hwid & GPIO35 ) << 2 ) |
+		(( hwid & GPIO34 ) << 4 ) | (( hwid & GPIO33 ) << 6 ));
 }

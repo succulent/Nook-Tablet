@@ -542,6 +542,12 @@
 /* DDR Memory Vendor Manufacturer ID */
 #define  SAMSUNG_SDRAM 0x1 
 #define  ELPIDA_SDRAM  0x3 
+#define	 HYNIX_SDRAM   0x6
+
+/* DDR Memory HWID codes */
+#define DDR_SIZE_256MB  0
+#define DDR_SIZE_512MB  1
+#define DDR_SIZE_1GB    2
 
 #ifndef	__ASSEMBLY__
 
@@ -589,6 +595,7 @@ void prcm_init(void);
 void configure_core_dpll_no_lock(void);
 void lock_core_dpll_shadow(void);
 int sdram_vendor(void);
+int get_hwid(void);
 /*******************************************************
  * Routine: delay
  * Description: spinning delay to use before udelay works

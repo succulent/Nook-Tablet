@@ -2,7 +2,6 @@
  * linux/includes/linux/max8903.h
  *
  * Copyright (C) 2011 Barnes & Noble, Inc.
- * Intrinsyc Software International, Inc. on behalf of Barnes & Nobles, Inc.
  *
  * Max8903 Battery Charger driver for Linux
  *

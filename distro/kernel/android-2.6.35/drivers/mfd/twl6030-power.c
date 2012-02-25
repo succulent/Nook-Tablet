@@ -7,7 +7,6 @@
  * Copyright (c) 2011 Barnes & Noble Inc.
  *
  * Written by Rajeev Kulkarni <rajeevk@ti.com>
- * Modified by David Bolcsfoldi <dbolcsfoldi@intrinsyc.com>
  *
  * This file is subject to the terms and conditions of the GNU General
  * Public License. See the file "COPYING" in the main directory of this

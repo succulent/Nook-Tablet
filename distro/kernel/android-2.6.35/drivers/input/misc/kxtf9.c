@@ -111,7 +111,10 @@ struct kxtf9_data {
 	u8 resume[RESUME_ENTRIES];
 	int res_interval;
 	int irq;
+#ifdef CONFIG_HAS_EARLYSUSPEND
 	struct early_suspend early_suspend;
+	atomic_t suspended;
+#endif
 };
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
@@ -582,7 +585,7 @@ static int kxtf9_enable(struct kxtf9_data *tf9)
 
 	aprintk("kxtf9: kxtf9_enable ...\n");
 
-	if (!atomic_cmpxchg(&tf9->enabled, 0, 1)) {
+	if (!atomic_read(&tf9->suspended) && !atomic_cmpxchg(&tf9->enabled, 0, 1)) {
 		err = kxtf9_device_power_on(tf9);
 		err = kxtf9_i2c_read(tf9, INT_REL, &buf, 1);
 		if (err < 0) {
@@ -1082,14 +1085,14 @@ static int __devexit kxtf9_remove(struct i2c_client *client)
 static int kxtf9_resume(struct i2c_client *client)
 {
 	struct kxtf9_data *tf9 = i2c_get_clientdata(client);
-
+	atomic_set(&tf9->suspended, 0);
 	return kxtf9_enable(tf9);
 }
 
 static int kxtf9_suspend(struct i2c_client *client, pm_message_t mesg)
 {
 	struct kxtf9_data *tf9 = i2c_get_clientdata(client);
-
+	atomic_set(&tf9->suspended, 1);
 	return kxtf9_disable(tf9);
 }
 #endif
@@ -1123,8 +1126,8 @@ static struct i2c_driver kxtf9_driver = {
 	.remove = __devexit_p(kxtf9_remove),
 #ifndef CONFIG_HAS_EARLYSUSPEND
 	.resume = kxtf9_resume,
-	.suspend = kxtf9_suspend,
 #endif
+	.suspend = kxtf9_suspend,
 	.id_table = kxtf9_id,
 };
 

@@ -149,4 +149,51 @@
 # define ENHANCED_UI_EE_NAME		"750-2075"
 #endif
 
+/* OMAP4 GPIO registers */
+#define OMAP4_GPIO_DATAIN_GPIO2		(0x48055138)
+
+#define GPIO0                           (0x1 << 0)
+#define GPIO1                           (0x1 << 1)
+#define GPIO2                           (0x1 << 2)
+#define GPIO3                           (0x1 << 3)
+#define GPIO4                           (0x1 << 4)
+#define GPIO5                           (0x1 << 5)
+#define GPIO6                           (0x1 << 6)
+#define GPIO7                           (0x1 << 7)
+#define GPIO8                           (0x1 << 8)
+#define GPIO9                           (0x1 << 9)
+#define GPIO10                          (0x1 << 10)
+#define GPIO11                          (0x1 << 11)
+#define GPIO12                          (0x1 << 12)
+#define GPIO13                          (0x1 << 13)
+#define GPIO14                          (0x1 << 14)
+#define GPIO15                          (0x1 << 15)
+#define GPIO16                          (0x1 << 16)
+#define GPIO17                          (0x1 << 17)
+#define GPIO18                          (0x1 << 18)
+#define GPIO19                          (0x1 << 19)
+#define GPIO20                          (0x1 << 20)
+#define GPIO21                          (0x1 << 21)
+#define GPIO22                          (0x1 << 22)
+#define GPIO23                          (0x1 << 23)
+#define GPIO24                          (0x1 << 24)
+#define GPIO25                          (0x1 << 25)
+#define GPIO26                          (0x1 << 26)
+#define GPIO27                          (0x1 << 27)
+#define GPIO28                          (0x1 << 28)
+#define GPIO29                          (0x1 << 29)
+#define GPIO30                          (0x1 << 30)
+#define GPIO31                          (0x1 << 31)
+
+#define GPIO33				GPIO1
+#define GPIO34				GPIO2
+#define GPIO35				GPIO3
+
+#define GPIO40				GPIO8
+#define GPIO41				GPIO9
+
+#define GPIO49				GPIO17
+#define GPIO50				GPIO18
+#define GPIO51				GPIO19
+
 #endif  /* _OMAP4430_SYS_H_ */
