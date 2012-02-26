@@ -1,0 +1,27 @@
+Build instructions:
+
+Download and install toolchain from:
+"http://www.codesourcery.com/sgpp/lite/arm/portal/release1293". Select the IA32 GNU/Linux TAR one (MD5: c6930d14801b4fab6705d72df013e58b)
+
+mkdir NOOK
+cd NOOK
+tar cvfz /path/to/nook_tablet_1-4-1.tar.gz
+
+export BOARD_KERNEL_CMDLINE="androidboot.console=ttyO0 console=ttyO0,115200n8 mem=448M@0x80000000 mem=35M@0x9CC00000 mem=512M@0xA0000000 init=/init rootwait vram=32M,9CC00000 omapfb.vram=0:5M@9CC00000"
+export ARCH=arm
+export CROSS_COMPILE=arm-none-linux-gnueabi-
+export PATH=../../u-boot/tools:$PATH
+
+cd distro/x-loader
+make omap4430sdp_config
+make
+
+cd ../u-boot
+make omap4430sdp_config
+make
+
+cd ../kernel/android-2.6.35
+make android_4430BN_defconfig
+make uImage
+
+

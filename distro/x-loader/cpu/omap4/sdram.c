@@ -102,6 +102,12 @@
 
 #define CS1_MR(mr)	((mr) | 0x80000000)
 
+int use_cs1(const struct ddr_regs *ddr_regs)
+{
+	return ((ddr_regs->config_init & 0x8) >> 3);
+}
+
+
 void reset_phy(unsigned int base)
 {
 	__raw_writel(__raw_readl(base + IODFT_TLGC) | (1 << 10),
@@ -173,19 +179,20 @@ static void emif_config(unsigned int base, const struct ddr_regs *ddr_regs)
 	do {
 		reg_value = __raw_readl(base + EMIF_LPDDR2_MODE_REG_DATA);
 	} while ((reg_value & 0x1) != 0);
-
-	__raw_writel(CS1_MR(MR0_ADDR), base + EMIF_LPDDR2_MODE_REG_CFG);
-	do {
-		reg_value = __raw_readl(base + EMIF_LPDDR2_MODE_REG_DATA);
-	} while ((reg_value & 0x1) != 0);
-
+	if (use_cs1(ddr_regs)) {
+		__raw_writel(CS1_MR(MR0_ADDR), base + EMIF_LPDDR2_MODE_REG_CFG);
+		do {
+			reg_value = __raw_readl(base + EMIF_LPDDR2_MODE_REG_DATA);
+		} while ((reg_value & 0x1) != 0);
+	}
 
 	/* set MR10 register */
 	__raw_writel(MR10_ADDR, base + EMIF_LPDDR2_MODE_REG_CFG);
 	__raw_writel(MR10_ZQINIT, base + EMIF_LPDDR2_MODE_REG_DATA);
-	__raw_writel(CS1_MR(MR10_ADDR), base + EMIF_LPDDR2_MODE_REG_CFG);
-	__raw_writel(MR10_ZQINIT, base + EMIF_LPDDR2_MODE_REG_DATA);
-
+	if (use_cs1(ddr_regs)) {
+		__raw_writel(CS1_MR(MR10_ADDR), base + EMIF_LPDDR2_MODE_REG_CFG);
+		__raw_writel(MR10_ZQINIT, base + EMIF_LPDDR2_MODE_REG_DATA);
+	}
 	/* wait for tZQINIT=1us  */
 	spin_delay(2000); /* value for up to 2GHz MPU spin */
 
@@ -194,16 +201,19 @@ static void emif_config(unsigned int base, const struct ddr_regs *ddr_regs)
 	/* set MR1 register */
 	__raw_writel(MR1_ADDR, base + EMIF_LPDDR2_MODE_REG_CFG);
 	__raw_writel(ddr_regs->mr1, base + EMIF_LPDDR2_MODE_REG_DATA);
-	__raw_writel(CS1_MR(MR1_ADDR), base + EMIF_LPDDR2_MODE_REG_CFG);
-	__raw_writel(ddr_regs->mr1, base + EMIF_LPDDR2_MODE_REG_DATA);
 
+	if (use_cs1(ddr_regs)) {
+		__raw_writel(CS1_MR(MR1_ADDR), base + EMIF_LPDDR2_MODE_REG_CFG);
+		__raw_writel(ddr_regs->mr1, base + EMIF_LPDDR2_MODE_REG_DATA);
+	}
 
 	/* set MR2 register RL=6 for OPP100 */
 	__raw_writel(MR2_ADDR, base + EMIF_LPDDR2_MODE_REG_CFG);
 	__raw_writel(ddr_regs->mr2, base + EMIF_LPDDR2_MODE_REG_DATA);
-	__raw_writel(CS1_MR(MR2_ADDR), base + EMIF_LPDDR2_MODE_REG_CFG);
-	__raw_writel(ddr_regs->mr2, base + EMIF_LPDDR2_MODE_REG_DATA);
-
+	if (use_cs1(ddr_regs)) {
+		__raw_writel(CS1_MR(MR2_ADDR), base + EMIF_LPDDR2_MODE_REG_CFG);
+		__raw_writel(ddr_regs->mr2, base + EMIF_LPDDR2_MODE_REG_DATA);
+	}
 	/* Set SDRAM CONFIG register again here with final RL-WL value */
 	__raw_writel(ddr_regs->config_final, base + EMIF_SDRAM_CONFIG);
 	__raw_writel(ddr_regs->phy_ctrl_1, base + EMIF_DDR_PHY_CTRL_1);
@@ -219,9 +229,11 @@ static void emif_config(unsigned int base, const struct ddr_regs *ddr_regs)
 	/* set MR16 register */
 	__raw_writel(MR16_ADDR | REF_EN, base + EMIF_LPDDR2_MODE_REG_CFG);
 	__raw_writel(0, base + EMIF_LPDDR2_MODE_REG_DATA);
-	__raw_writel(CS1_MR(MR16_ADDR | REF_EN),
-			base + EMIF_LPDDR2_MODE_REG_CFG);
-	__raw_writel(0, base + EMIF_LPDDR2_MODE_REG_DATA);
+	if (use_cs1(ddr_regs)) {
+		__raw_writel(CS1_MR(MR16_ADDR | REF_EN),
+				base + EMIF_LPDDR2_MODE_REG_CFG);
+		__raw_writel(0, base + EMIF_LPDDR2_MODE_REG_DATA);
+	}
 	/* LPDDR2 init complete */
 
 }

@@ -5,7 +5,6 @@
  * Author: Tomi Valkeinen <tomi.valkeinen@nokia.com>
  *
  * Copyright (c) 2010 Barnes & Noble
- * David Bolcsfoldi <dbolcsfoldi@intrinsyc.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 as published by
@@ -181,7 +180,8 @@ static int boxer_panel_start(struct omap_dss_device *dssdev)
 			dssdev->platform_disable(dssdev);
 
 		msleep(LCD_RST_DELAY);
-		spi_send(boxer_spi, 0x00, 0xad);
+		spi_send(boxer_spi, 0x00, 0x21);
+		spi_send(boxer_spi, 0x00, 0xa5);
 		spi_send(boxer_spi, 0x01, 0x30);
 		spi_send(boxer_spi, 0x02, 0x40);
 		spi_send(boxer_spi, 0x0e, 0x5f);
@@ -190,6 +190,7 @@ static int boxer_panel_start(struct omap_dss_device *dssdev)
 		spi_send(boxer_spi, 0x02, 0x43);
 		spi_send(boxer_spi, 0x0a, 0x28);
 		spi_send(boxer_spi, 0x10, 0x41);
+		spi_send(boxer_spi, 0x00, 0xad);
 		msleep(LCD_INIT_DELAY); 
 	} else {
 		// if regulator is on this must mean first boot i.e. u-boot left the regulator on 

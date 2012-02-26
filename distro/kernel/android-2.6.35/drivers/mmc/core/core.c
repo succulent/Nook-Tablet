@@ -80,7 +80,7 @@ static int mmc_schedule_delayed_work(struct delayed_work *work,
 /*
  * Internal function. Flush all scheduled work from the MMC work queue.
  */
-static void mmc_flush_scheduled_work(void)
+void mmc_flush_scheduled_work(void)
 {
 	flush_workqueue(workqueue);
 }
@@ -526,17 +526,6 @@ int mmc_try_claim_host(struct mmc_host *host)
 	return claimed_host;
 }
 EXPORT_SYMBOL(mmc_try_claim_host);
-
-static int __mmc_is_claimed(struct mmc_host *host)
-{
-	int claimed = 0;
-	unsigned long flags;
-
-	spin_lock_irqsave(&host->lock, flags);
-	claimed = host->claimed;
-	spin_unlock_irqrestore(&host->lock, flags);
-	return claimed;
-}
 
 static void mmc_do_release_host(struct mmc_host *host)
 {
@@ -1336,10 +1325,12 @@ int mmc_card_sleep(struct mmc_host *host)
 	int err = -ENOSYS;
 
 	mmc_bus_get(host);
+	mmc_claim_host(host);
 
 	if (host->bus_ops && !host->bus_dead && host->bus_ops->awake)
 		err = host->bus_ops->sleep(host);
 
+	mmc_release_host(host);
 	mmc_bus_put(host);
 
 	return err;
@@ -1451,11 +1442,6 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 	switch (mode) {
 	case PM_HIBERNATION_PREPARE:
 	case PM_SUSPEND_PREPARE:
-		// work around for WiFi issue
-		if (__mmc_is_claimed(host)) {
-			dev_err(&host->class_dev, "Failed to claim host %d in %lu, aborting suspend", host->index, mode);
-			return NOTIFY_BAD;
-		}
 
 		spin_lock_irqsave(&host->lock, flags);
 		if (mmc_bus_needs_resume(host)) {

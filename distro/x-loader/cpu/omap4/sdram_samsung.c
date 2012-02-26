@@ -40,19 +40,42 @@ const struct ddr_regs ddr_regs_samsung4G_400_mhz = {
 	.ref_ctrl	= 0x00000618,
 	.config_init	= 0x80000eb2,
 	.config_final	= 0x80001ab2,
-	.zq_config	= 0xD00b3215,
+	.zq_config	= 0x500b3215,
 	.mr1		= 0x83,
 	.mr2		= 0x4
+};
+
+const struct ddr_regs ddr_regs_samsung2G_400_mhz = {
+        /* tRRD changed from 10ns to 12.5ns because of the tFAW requirement*/
+        .tim1           = 0x10eb0662,
+        .tim2           = 0x20370dd2,
+        .tim3           = 0x00b1c33f,
+        .phy_ctrl_1     = 0x849FF408,
+        .ref_ctrl       = 0x00000618,
+        .config_init    = 0x80000eb1,
+        .config_final   = 0x80001ab1,
+        .zq_config      = 0x500b3215,
+        .mr1            = 0x83,
+        .mr2            = 0x4
 };
 
 /* ddr_init() - initializes ddr */
 void __ddr_init_samsung(void)
 {
-	u32 rev;
+	u32 ddr_size;
 	const struct ddr_regs *ddr_regs = 0;
 
+        ddr_size = ( get_hwid() & 0x18 ) >> 3;
+        switch (ddr_size) {
+		case    DDR_SIZE_512MB:
+			ddr_regs = &ddr_regs_samsung2G_400_mhz;
+                        break;
+                case    DDR_SIZE_1GB:
+                default:
+                        ddr_regs = &ddr_regs_samsung4G_400_mhz;
 
-	ddr_regs = &ddr_regs_samsung4G_400_mhz;
+        }
+
 
 	/*
 	 * DMM Configuration:

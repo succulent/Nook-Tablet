@@ -101,15 +101,31 @@ const struct ddr_regs ddr_regs_elpida2G_200_mhz_2cs = {
 /* ddr_init() - initializes ddr */
 void __ddr_init_elpida(void)
 {
-	u32 rev;
+	u32 rev, ddr_size;
 	const struct ddr_regs *ddr_regs = 0;
 	rev = omap_revision();
-	if (rev == OMAP4430_ES1_0)
-		ddr_regs = &ddr_regs_elpida2G_380_mhz;
-	else if (rev == OMAP4430_ES2_0)
-		ddr_regs = &ddr_regs_elpida2G_200_mhz_2cs;
-	else if (rev >= OMAP4430_ES2_1)
-		ddr_regs = &ddr_regs_elpida2G_400_mhz_2cs;
+	ddr_size = ( get_hwid() & 0x18 ) >> 3;
+
+	switch (rev) {
+		case OMAP4430_ES1_0:
+			ddr_regs = &ddr_regs_elpida2G_380_mhz;
+			break;
+		case OMAP4430_ES2_0:
+			ddr_regs = &ddr_regs_elpida2G_200_mhz_2cs;
+			break;
+		case OMAP4430_ES2_1:
+		default:
+			switch (ddr_size) {
+				case	DDR_SIZE_512MB:
+					ddr_regs = &ddr_regs_elpida2G_400_mhz;
+					break;
+				case	DDR_SIZE_1GB:
+				default:
+					ddr_regs = &ddr_regs_elpida2G_400_mhz_2cs;
+			}
+	}
+
+
 	/*
 	 * DMM Configuration:
 	 * 1GB - 128 byte interleaved
